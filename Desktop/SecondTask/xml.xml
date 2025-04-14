@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="catalog_transform.xsl"?>
+<catalog>
+    <product id="p001">
+        <name>Laptop</name>
+        <category>Electronics</category>
+        <price>1200.00</price>
+        <availability>In Stock</availability>
+    </product>
+    <product id="p002">
+        <name>Office Chair</name>
+        <category>Furniture</category>
+        <price>250.00</price>
+        <availability>Out of Stock</availability>
+    </product>
+</catalog>

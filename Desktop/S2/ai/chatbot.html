@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Smart Chatbot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    #chat {
+      border: 1px solid #ccc;
+      padding: 10px;
+      height: 300px;
+      overflow-y: scroll;
+      margin-bottom: 10px;
+    }
+    .message { margin: 5px 0; }
+    .user { color: blue; }
+    .bot { color: green; }
+  </style>
+</head>
+<body>
+
+  <h1>Smart Chatbot</h1>
+  <div id="chat"></div>
+
+  <input type="text" id="userInput" placeholder="Type a message..." style="width: 80%;">
+  <button onclick="handleUserInput()">Send</button>
+
+  <script>
+    const intents = {
+      greeting: ["hello", "hi", "hey", "yo", "good morning", "good evening"],
+      goodbye: ["bye", "goodbye", "see you", "later"],
+      thanks: ["thanks", "thank", "appreciate", "grateful"],
+      order_status: ["order", "track", "where", "status", "shipped", "shipping", "stuff", "package"],
+      return: ["return", "refund", "wrong", "broken", "damaged"],
+      help: ["help", "assist", "support", "how"]
+    };
+
+    const responses = {
+      greeting: ["Hi there!", "Hello! How can I help you?"],
+      goodbye: ["Goodbye!", "Talk to you later!"],
+      thanks: ["You're welcome!", "Glad I could help."],
+      order_status: ["Let me check your order...", "Tracking your order now."],
+      return: ["I'm sorry to hear that. Let's start a return process."],
+      help: ["I can help you with orders, returns, or general info. Ask away!"],
+      unknown: ["I'm not sure what you mean. Can you rephrase or explain?"]
+    };
+
+    const knowledgeBase = {
+  "return policy": "You can return any item within 30 days as long as it's unworn and in original condition.",
+  "shipping time": "We offer 3-5 day standard shipping and 1-2 day express shipping.",
+  "sizes": "We offer sizes from XS to XXL in most products.",
+  "track order": "You can track your order using the tracking number emailed to you.",
+  "store location": "We are an online-only store, but we ship nationwide.",
+  "wash instructions": "Most clothing items are machine washable. Check the label for details.",
+  "products": "We offer t-shirts, hoodies, jeans, and jackets for men and women.",
+    };
+
+
+    function preprocessInput(input) {
+      return input
+        .toLowerCase()
+        .replace(/[^\w\s]/gi, '')
+        .split(/\s+/)
+        .filter(word => word.length > 0);
+    }
+
+    function classifyIntent(words) {
+      const scores = {};
+      for (let intent in intents) {
+        scores[intent] = 0;
+        for (let word of words) {
+          if (intents[intent].includes(word)) {
+            scores[intent]++;
+          }
+        }
+      }
+
+      let topIntent = "unknown";
+      let topScore = 0;
+
+      for (let intent in scores) {
+        if (scores[intent] > topScore) {
+          topScore = scores[intent];
+          topIntent = intent;
+        }
+      }
+
+      return topScore > 0 ? topIntent : "unknown";
+    }
+
+    function generateResponse(userMessage) {
+      const words = preprocessInput(userMessage);
+      const intent = classifyIntent(words);
+
+      if (intent === "unknown") {
+        for (let key in knowledgeBase) {
+          if (userMessage.toLowerCase().includes(key)) {
+            return knowledgeBase[key];
+          }
+        }
+        return responses["unknown"][Math.floor(Math.random() * responses["unknown"].length)];
+      }
+
+      const possibleResponses = responses[intent];
+      return possibleResponses[Math.floor(Math.random() * possibleResponses.length)];
+    }
+
+    function handleUserInput() {
+      const input = document.getElementById('userInput').value;
+      if (!input.trim()) return;
+
+      appendMessage(input, 'user');
+      const response = generateResponse(input);
+      appendMessage(response, 'bot');
+
+      document.getElementById('userInput').value = '';
+    }
+
+    function appendMessage(text, sender) {
+      const chat = document.getElementById('chat');
+      const msg = document.createElement('div');
+      msg.className = `message ${sender}`;
+      msg.textContent = `${sender === 'user' ? 'You' : 'Bot'}: ${text}`;
+      chat.appendChild(msg);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    document.getElementById('userInput').addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') handleUserInput();
+    });
+
+  </script>
+
+</body>
+</html>
